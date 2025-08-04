@@ -52,7 +52,7 @@ public class Clienti {
         this.ragioneSociale = ragioneSociale;
         this.partitaIva = partitaIva;
         this.email = email;
-        this.dataInserimento = dataInserimento;
+        this.dataInserimento = LocalDate.now();
         this.dataUltimoContatto = dataUltimoContatto;
         this.fatturatoAnnuale = fatturatoAnnuale;
         this.pec = pec;
