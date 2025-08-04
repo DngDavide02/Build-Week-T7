@@ -1,4 +1,4 @@
-package Team7.Build_Week_T7.entities.exception;
+package Team7.Build_Week_T7.exception;
 
 import lombok.Getter;
 
