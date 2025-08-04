@@ -8,6 +8,7 @@ import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "provincia")
 @NoArgsConstructor
 public class Provincia {

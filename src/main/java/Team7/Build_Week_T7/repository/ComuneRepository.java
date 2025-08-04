@@ -6,10 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ComuneRepository extends JpaRepository<Comune, Long> {
-    List<Comune> findByProvincia(Provincia provincia);
-    List<Comune> findByDenominazioneContainingIgnoreCase(String denominazione);
+    Optional<Comune> findByProvincia(Provincia provincia);
+    Optional<Comune> findByDenominazioneContainingIgnoreCase(String denominazione);
     boolean existsByDenominazione(String denominazione);
 }

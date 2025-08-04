@@ -9,16 +9,19 @@ import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "comune")
 @NoArgsConstructor
 public class Comune {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     private String codiceProvincia;
     private String progressivoComune;
     private String denominazione;
+
     @ManyToOne
     private Provincia provincia;
 }
