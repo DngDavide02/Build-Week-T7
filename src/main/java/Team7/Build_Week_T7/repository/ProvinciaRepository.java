@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ProvinciaRepository extends JpaRepository<Provincia, String> {
-    Optional<Provincia> existsByProvincia(String provincia);
-    Optional<Provincia> findByProvincia (String provincia);
+public interface ProvinciaRepository extends JpaRepository<Provincia, Long> {
+    boolean existsByProvinciaIgnoreCase(String provincia);
+    Optional<Provincia> findByProvinciaIgnoreCase (String provincia);
 }

@@ -39,11 +39,11 @@ public class ProvinciaCSVService {
                     .parse();
 
             for (ProvinciaDTO provinciaDTO : provinciaDTOList) {
-                if (provinciaRepository.existsByProvincia(provinciaDTO.getProvincia()).isEmpty()) {
+                if (!provinciaRepository.existsByProvinciaIgnoreCase(provinciaDTO.getProvincia().trim())) {
                     Provincia provincia = new Provincia();
-                    provincia.setSigla(provinciaDTO.getSigla());
-                    provincia.setProvincia(provinciaDTO.getProvincia());
-                    provincia.setRegione(provinciaDTO.getRegione());
+                    provincia.setSigla(provinciaDTO.getSigla().trim());
+                    provincia.setProvincia(provinciaDTO.getProvincia().trim());
+                    provincia.setRegione(provinciaDTO.getRegione().trim());
                     provinciaRepository.save(provincia);
                 }
             }

@@ -45,14 +45,27 @@ public class ComuneCSVService {
 
         for (ComuneDTO comuneDTO : comuneDTOList) {
             if (!comuneRepository.existsByDenominazione(comuneDTO.getDenominazione())) {
-                Provincia provincia = provinciaRepository.findByProvincia(comuneDTO.getProvincia())
-                        .orElseThrow(() -> new NotFoundException("Provincia non trovata " + comuneDTO.getProvincia()));
+                String nomeProvinciaNormalizzato = comuneDTO.getProvincia()
+                        .replace("-", " ")
+                        .replace("  ", " ")
+                        .trim();
+
+                var provinciaOpt = provinciaRepository.findByProvinciaIgnoreCase(nomeProvinciaNormalizzato);
+
+
+                if (provinciaOpt.isEmpty()) {
+                    System.err.println("Provincia non trovata per comune: " + comuneDTO.getDenominazione() +
+                            " | Provincia nel CSV: '" + comuneDTO.getProvincia() + "'");
+                    continue;
+                }
+
+                Provincia provincia = provinciaOpt.get();
 
                 Comune comune = new Comune();
-                comune.setProgressivoComune(comuneDTO.getProgressivoComune());
-                comune.setDenominazione(comuneDTO.getDenominazione());
+                comune.setProgressivoComune(comuneDTO.getProgressivoComune().trim());
+                comune.setDenominazione(comuneDTO.getDenominazione().trim());
                 comune.setProvincia(provincia);
-                comune.setCodiceProvincia(comuneDTO.getCodiceProvincia());
+                comune.setCodiceProvincia(comuneDTO.getCodiceProvincia().trim());
                 comuneRepository.save(comune);
             }
         }
