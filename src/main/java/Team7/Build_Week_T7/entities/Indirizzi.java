@@ -20,9 +20,9 @@ public class Indirizzi {
     private int cap;
     @ManyToOne
     @JoinColumn(name = "comune_id")
-    private Comuni comune;
+    private Comune comune;
 
-    public Indirizzi(String via, int civico, String localita, int cap, Comuni comune) {
+    public Indirizzi(String via, int civico, String localita, int cap, Comune comune) {
         this.via = via;
         this.civico = civico;
         this.localita = localita;

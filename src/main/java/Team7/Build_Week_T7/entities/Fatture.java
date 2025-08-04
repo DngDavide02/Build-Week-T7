@@ -22,4 +22,7 @@ public class Fatture {
     @ManyToOne
     @JoinColumn(name = "stato_fatture_id")
     private StatoFatture statoFatture;
+
+    @ManyToOne
+    private Clienti clienti;
 }
