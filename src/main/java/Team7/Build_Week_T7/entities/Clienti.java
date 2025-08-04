@@ -39,16 +39,16 @@ public class Clienti {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "sede_legale_id")
-    private Indirizzo sedeLegale;
+    private Indirizzi sedeLegale;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "sede_operativa_id")
-    private Indirizzo sedeOperativa;
+    private Indirizzi sedeOperativa;
 
     public Clienti(String ragioneSociale, String partitaIva, String email, LocalDate dataInserimento,
                    LocalDate dataUltimoContatto, int fatturatoAnnuale, String pec, String telefono,
                    String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto,
-                   String logoAziendale, TipoCliente tipoCliente, Indirizzo sedeLegale, Indirizzo sedeOperativa) {
+                   String logoAziendale, TipoCliente tipoCliente, Indirizzi sedeLegale, Indirizzi sedeOperativa) {
         this.ragioneSociale = ragioneSociale;
         this.partitaIva = partitaIva;
         this.email = email;
