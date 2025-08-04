@@ -7,7 +7,7 @@ import java.time.LocalDate;
 public record ClientiDTO(
         Long id,
         String ragioneSociale,
-        String partitaIva,
+        String partitaIVA,
         String email,
         LocalDate dataInserimento,
         LocalDate dataUltimoContatto,

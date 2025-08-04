@@ -7,6 +7,7 @@ import Team7.Build_Week_T7.payload.ComuneDTO;
 import Team7.Build_Week_T7.repository.ComuneRepository;
 import Team7.Build_Week_T7.repository.ProvinciaRepository;
 import com.opencsv.bean.CsvToBeanBuilder;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -43,17 +44,26 @@ public class ComuneCSVService {
                 .parse();
 
         for (ComuneDTO comuneDTO : comuneDTOList) {
-            if (!comuneRepository.existsByDenominazione(comuneDTO.denominazione())) {
-                Provincia provincia = provinciaRepository.findByProvincia(comuneDTO.provincia())
-                        .orElseThrow(() -> new NotFoundException("Provincia non trovata" + comuneDTO.provincia()));
+            if (!comuneRepository.existsByDenominazione(comuneDTO.getDenominazione())) {
+                Provincia provincia = provinciaRepository.findByProvincia(comuneDTO.getProvincia())
+                        .orElseThrow(() -> new NotFoundException("Provincia non trovata " + comuneDTO.getProvincia()));
 
                 Comune comune = new Comune();
-                comune.setProgressivoComune(comuneDTO.progressivoComune());
-                comune.setDenominazione(comuneDTO.denominazione());
+                comune.setProgressivoComune(comuneDTO.getProgressivoComune());
+                comune.setDenominazione(comuneDTO.getDenominazione());
                 comune.setProvincia(provincia);
-                comune.setCodiceProvincia(comuneDTO.codiceProvincia());
+                comune.setCodiceProvincia(comuneDTO.getCodiceProvincia());
                 comuneRepository.save(comune);
             }
+        }
+    }
+
+    @PostConstruct
+    public void init() {
+        if (comuneRepository.count() == 0) {
+            importaCSVComuni();
+        } else {
+            System.out.println("Comuni già presenti.");
         }
     }
 }

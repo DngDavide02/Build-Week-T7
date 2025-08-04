@@ -6,8 +6,10 @@ import Team7.Build_Week_T7.payload.ComuneDTO;
 import Team7.Build_Week_T7.payload.ProvinciaDTO;
 import Team7.Build_Week_T7.repository.ProvinciaRepository;
 import com.opencsv.bean.CsvToBeanBuilder;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +24,11 @@ public class ProvinciaCSVService {
 
     public void importaCSVProvincia() {
         try {
-            InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("provincie-italiane.csv")));
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("province-italiane.csv");
+            if (inputStream == null) {
+                throw new NotFoundException("File CSV provincie-italiane.csv non trovato!");
+            }
+            InputStreamReader reader = new InputStreamReader(inputStream);
 
             List<ProvinciaDTO> provinciaDTOList = new CsvToBeanBuilder<ProvinciaDTO>(reader)
                     .withType(ProvinciaDTO.class)
@@ -33,16 +39,25 @@ public class ProvinciaCSVService {
                     .parse();
 
             for (ProvinciaDTO provinciaDTO : provinciaDTOList) {
-                if (provinciaRepository.existsByProvincia(provinciaDTO.provincia()).isPresent()) {
+                if (provinciaRepository.existsByProvincia(provinciaDTO.getProvincia()).isEmpty()) {
                     Provincia provincia = new Provincia();
-                    provincia.setSigla(provinciaDTO.sigla());
-                    provincia.setProvincia(provinciaDTO.provincia());
-                    provincia.setRegione(provinciaDTO.regione());
+                    provincia.setSigla(provinciaDTO.getSigla());
+                    provincia.setProvincia(provinciaDTO.getProvincia());
+                    provincia.setRegione(provinciaDTO.getRegione());
                     provinciaRepository.save(provincia);
                 }
             }
         } catch (NotFoundException e) {
             throw new NotFoundException("CSV non trovato");
+        }
+    }
+
+    @PostConstruct
+    public void init() {
+        if (provinciaRepository.count() == 0) {
+            importaCSVProvincia();
+        } else {
+            System.out.println("provincie già presenti.");
         }
     }
 }

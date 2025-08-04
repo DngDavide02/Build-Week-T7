@@ -22,7 +22,7 @@ public class Clienti {
     private Long id;
 
     private String ragioneSociale;
-    private String partitaIva;
+    private String partitaIVA;
     private String email;
     private LocalDate dataInserimento;
     private LocalDate dataUltimoContatto;
@@ -46,12 +46,12 @@ public class Clienti {
     @JoinColumn(name = "sede_operativa_id")
     private Indirizzi sedeOperativa;
 
-    public Clienti(String ragioneSociale, String partitaIva, String email, LocalDate dataInserimento,
+    public Clienti(String ragioneSociale, String partitaIVA, String email, LocalDate dataInserimento,
                    LocalDate dataUltimoContatto, int fatturatoAnnuale, String pec, String telefono,
                    String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto,
                    String logoAziendale, TipoCliente tipoCliente, Indirizzi sedeLegale, Indirizzi sedeOperativa) {
         this.ragioneSociale = ragioneSociale;
-        this.partitaIva = partitaIva;
+        this.partitaIVA = partitaIVA;
         this.email = email;
         this.dataInserimento = LocalDate.now();
         this.dataUltimoContatto = dataUltimoContatto;

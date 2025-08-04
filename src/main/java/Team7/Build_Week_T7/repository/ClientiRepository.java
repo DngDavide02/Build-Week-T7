@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface ClientiRepository extends JpaRepository <Clienti, Long> {
-    boolean existByPartitaIVA (String partitaIVA);
+    boolean existsByPartitaIVA (String partitaIVA);
     List<Clienti> findByTipoCliente(TipoCliente tipoCliente);
     Clienti findByEmail(String email);
 }

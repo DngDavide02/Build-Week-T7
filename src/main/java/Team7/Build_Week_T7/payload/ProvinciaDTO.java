@@ -1,16 +1,20 @@
 package Team7.Build_Week_T7.payload;
 
 import com.opencsv.bean.CsvBindByPosition;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public record ProvinciaDTO (
-
+@NoArgsConstructor
+@Getter
+@Setter
+public class ProvinciaDTO {
         @CsvBindByPosition(position = 0)
-        String sigla,
+        private String sigla;
 
         @CsvBindByPosition(position = 1)
-        String provincia,
+        private String provincia;
 
         @CsvBindByPosition(position = 2)
-        String regione
-
-) {}
+        private String regione;
+}
