@@ -1,0 +1,159 @@
+package Team7.Build_Week_T7.service;
+
+import Team7.Build_Week_T7.entities.Clienti;
+import Team7.Build_Week_T7.entities.Indirizzi;
+import Team7.Build_Week_T7.entities.TipoCliente;
+import Team7.Build_Week_T7.exception.BadRequestException;
+import Team7.Build_Week_T7.exception.NotFoundException;
+import Team7.Build_Week_T7.payload.ClientiDTO;
+import Team7.Build_Week_T7.payload.ClientiUpdateDTO;
+import Team7.Build_Week_T7.payload.IndirizziDTO;
+import Team7.Build_Week_T7.repository.ClientiRepository;
+import Team7.Build_Week_T7.repository.ComuneRepository;
+import Team7.Build_Week_T7.repository.IndirizziRepository;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+
+@Service
+public class ClienteService {
+
+    @Autowired
+    private ClientiRepository clientiRepository;
+
+    @Autowired
+    private Cloudinary cloudinary;
+
+    @Autowired
+    private ComuneRepository comuneRepository;
+
+    @Autowired
+    private IndirizziService indirizziService;
+
+    @Autowired
+    private ComuneCSVService comuneCSVService;
+
+    @Autowired
+    private IndirizziRepository indirizziRepository;
+
+
+    public ClienteService(ClientiRepository clientiRepository, Cloudinary cloudinary, ComuneRepository comuneRepository) {
+        this.clientiRepository = clientiRepository;
+        this.cloudinary = cloudinary;
+        this.comuneRepository = comuneRepository;
+    }
+
+    public List<Clienti> getAllClienti() {
+        return clientiRepository.findAll();
+    }
+
+    public List<Clienti> getClienteByTipo(TipoCliente tipoCliente) {
+        return clientiRepository.findByTipoCliente(tipoCliente);
+    }
+
+    public Clienti getClienteByID(Long id){
+        return clientiRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(id));
+    }
+
+    public Clienti creaCliente(ClientiDTO dto) {
+        if (clientiRepository.existsByPartitaIVA(dto.partitaIVA())) {
+            throw new BadRequestException("cliente con partita IVA già esistente");
+        }
+
+        Indirizzi newIndirizzi = new Indirizzi(dto.via(), dto.civico(), dto.localita(), dto.cap(), comuneCSVService.findById(dto.comuneId()));
+        Indirizzi savedIndirizzi = this.indirizziRepository.save(newIndirizzi);
+
+        Clienti cliente = new Clienti(
+                dto.ragioneSociale(),
+                dto.partitaIVA(),
+                dto.email(),
+                LocalDate.now(),
+                dto.dataUltimoContatto(),
+                dto.fatturatoAnnuale(),
+                dto.pec(),
+                dto.telefono(),
+                dto.emailContatto(),
+                dto.nomeContatto(),
+                dto.cognomeContatto(),
+                dto.telefonoContatto(),
+                dto.logoAziendale(),
+                dto.tipoCliente(),
+                newIndirizzi,
+                newIndirizzi
+        );
+
+        return clientiRepository.saveCustom(cliente);
+    }
+
+
+    public String uploadLogoCliente(Long clienteId, MultipartFile file) {
+        try {
+            Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            String imageURL = (String) result.get("secure_url");
+
+            Clienti cliente = clientiRepository.findById(clienteId)
+                    .orElseThrow(() -> new NotFoundException("Cliente non trovato con id: " + clienteId));
+            cliente.setLogoAziendale(imageURL);
+            clientiRepository.save(cliente);
+
+            return imageURL;
+        } catch (Exception e) {
+            throw new BadRequestException("Errore durante il caricamento del logo: " + e.getMessage());
+        }
+    }
+
+
+    public Clienti updateCliente (Long id, ClientiUpdateDTO dettagliCliente) {
+        Clienti cliente = clientiRepository.findById(id).orElseThrow(() -> new NotFoundException("cliente con id: " + id + " non trovato"));
+
+        if (dettagliCliente.ragioneSociale() != null)
+            cliente.setRagioneSociale(dettagliCliente.ragioneSociale());
+
+        if (dettagliCliente.partitaIVA() != null)
+            cliente.setPartitaIVA(dettagliCliente.partitaIVA());
+
+        if (dettagliCliente.email() != null)
+            cliente.setEmail(dettagliCliente.email());
+
+        if (dettagliCliente.dataUltimoContatto() != null)
+            cliente.setDataUltimoContatto(dettagliCliente.dataUltimoContatto());
+
+        if (dettagliCliente.fatturatoAnnuale() != 0)
+            cliente.setFatturatoAnnuale(dettagliCliente.fatturatoAnnuale());
+
+        if (dettagliCliente.pec() != null)
+            cliente.setPec(dettagliCliente.pec());
+
+        if (dettagliCliente.telefono() != null)
+            cliente.setTelefono(dettagliCliente.telefono());
+
+        if (dettagliCliente.emailContatto() != null)
+            cliente.setEmailContatto(dettagliCliente.emailContatto());
+
+        if (dettagliCliente.nomeContatto() != null)
+            cliente.setNomeContatto(dettagliCliente.nomeContatto());
+
+        if (dettagliCliente.cognomeContatto() != null)
+            cliente.setCognomeContatto(dettagliCliente.cognomeContatto());
+
+        if (dettagliCliente.telefonoContatto() != null)
+            cliente.setTelefonoContatto(dettagliCliente.telefonoContatto());
+
+        if (dettagliCliente.logoAziendale() != null)
+            cliente.setLogoAziendale(dettagliCliente.logoAziendale());
+
+        if (dettagliCliente.tipoCliente() != null)
+            cliente.setTipoCliente(dettagliCliente.tipoCliente());
+
+        return clientiRepository.save(cliente);
+    }
+}
