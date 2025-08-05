@@ -9,6 +9,7 @@ import Team7.Build_Week_T7.payload.ClientiUpdateDTO;
 import Team7.Build_Week_T7.payload.IndirizziDTO;
 import Team7.Build_Week_T7.service.ClienteService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -63,5 +64,11 @@ public class ClienteController {
     @PostMapping("/{id}/upload-logo")
     public String uploadLogoCliente(@PathVariable Long id, @RequestParam("file")MultipartFile file) {
         return clienteService.uploadLogoCliente(id, file);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public void deleteById(@PathVariable Long id){
+        clienteService.deleteById(id);
     }
 }
