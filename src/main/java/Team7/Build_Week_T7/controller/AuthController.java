@@ -9,7 +9,6 @@ import Team7.Build_Week_T7.service.AuthorizationService;
 import Team7.Build_Week_T7.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,12 +27,15 @@ public class AuthController {
         return new LoginRespDTO(accessToken);
     }
 
+
+    //TODO!! VA TOLTO ALTRIMENTI SI REGISTRA CHIUNQUE
+
     // POST /users
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> createUser(@RequestBody @Validated UserRegistrationDTO dto) {
-        User createdUser = userService.save(dto);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    public User createUser(@RequestBody @Validated UserRegistrationDTO dto) {
+        return userService.save(dto);
     }
+
 
 }
