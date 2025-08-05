@@ -5,6 +5,7 @@ import Team7.Build_Week_T7.entities.User;
 import Team7.Build_Week_T7.payload.LoginDTO;
 import Team7.Build_Week_T7.payload.LoginRespDTO;
 import Team7.Build_Week_T7.payload.UserRegistrationDTO;
+import Team7.Build_Week_T7.payload.UserRespDTO;
 import Team7.Build_Week_T7.service.AuthorizationService;
 import Team7.Build_Week_T7.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +34,9 @@ public class AuthController {
     // POST /users
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestBody @Validated UserRegistrationDTO dto) {
-        return userService.save(dto);
+    public UserRespDTO createUser(@RequestBody @Validated UserRegistrationDTO dto) {
+        User createdUser = userService.save(dto);
+        return new UserRespDTO(createdUser.getId());
     }
 
 
