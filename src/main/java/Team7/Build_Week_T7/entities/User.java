@@ -44,7 +44,7 @@ public class User implements UserDetails {
     private String cognome;
     private String avatar;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     @JsonIgnoreProperties("user")  // evitiamo loop
     private List<UserRole> roles;
 
@@ -55,6 +55,7 @@ public class User implements UserDetails {
         this.nome = nome;
         this.cognome = cognome;
         this.avatar = avatar;
+
     }
 
     @Override
