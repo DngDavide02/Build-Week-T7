@@ -1,16 +1,23 @@
 package Team7.Build_Week_T7.service;
 
 import Team7.Build_Week_T7.entities.Clienti;
+import Team7.Build_Week_T7.entities.Indirizzi;
 import Team7.Build_Week_T7.entities.TipoCliente;
 import Team7.Build_Week_T7.exception.BadRequestException;
 import Team7.Build_Week_T7.exception.NotFoundException;
+import Team7.Build_Week_T7.payload.ClientiDTO;
 import Team7.Build_Week_T7.payload.ClientiUpdateDTO;
+import Team7.Build_Week_T7.payload.IndirizziDTO;
 import Team7.Build_Week_T7.repository.ClientiRepository;
+import Team7.Build_Week_T7.repository.ComuneRepository;
+import Team7.Build_Week_T7.repository.IndirizziRepository;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,13 +26,29 @@ import java.util.Optional;
 @Service
 public class ClienteService {
 
-    private final ClientiRepository clientiRepository;
-    private final Cloudinary cloudinary;
+    @Autowired
+    private ClientiRepository clientiRepository;
+
+    @Autowired
+    private Cloudinary cloudinary;
+
+    @Autowired
+    private ComuneRepository comuneRepository;
+
+    @Autowired
+    private IndirizziService indirizziService;
+
+    @Autowired
+    private ComuneCSVService comuneCSVService;
+
+    @Autowired
+    private IndirizziRepository indirizziRepository;
 
 
-    public ClienteService(ClientiRepository clientiRepository, Cloudinary cloudinary) {
+    public ClienteService(ClientiRepository clientiRepository, Cloudinary cloudinary, ComuneRepository comuneRepository) {
         this.clientiRepository = clientiRepository;
         this.cloudinary = cloudinary;
+        this.comuneRepository = comuneRepository;
     }
 
     public List<Clienti> getAllClienti() {
@@ -41,12 +64,36 @@ public class ClienteService {
                 .orElseThrow(() -> new NotFoundException(id));
     }
 
-    public Clienti creaCliente (Clienti cliente) {
-        if (clientiRepository.existsByPartitaIVA(cliente.getPartitaIVA())) {
-            throw new BadRequestException("cliente con partita IVA gia esistente");
+    public Clienti creaCliente(ClientiDTO dto) {
+        if (clientiRepository.existsByPartitaIVA(dto.partitaIVA())) {
+            throw new BadRequestException("cliente con partita IVA già esistente");
         }
-        return clientiRepository.save(cliente);
+
+        Indirizzi newIndirizzi = new Indirizzi(dto.via(), dto.civico(), dto.localita(), dto.cap(), comuneCSVService.findById(dto.comuneId()));
+        Indirizzi savedIndirizzi = this.indirizziRepository.save(newIndirizzi);
+
+        Clienti cliente = new Clienti(
+                dto.ragioneSociale(),
+                dto.partitaIVA(),
+                dto.email(),
+                LocalDate.now(),
+                dto.dataUltimoContatto(),
+                dto.fatturatoAnnuale(),
+                dto.pec(),
+                dto.telefono(),
+                dto.emailContatto(),
+                dto.nomeContatto(),
+                dto.cognomeContatto(),
+                dto.telefonoContatto(),
+                dto.logoAziendale(),
+                dto.tipoCliente(),
+                newIndirizzi,
+                newIndirizzi
+        );
+
+        return clientiRepository.saveCustom(cliente);
     }
+
 
     public String uploadLogoCliente(Long clienteId, MultipartFile file) {
         try {

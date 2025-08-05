@@ -31,7 +31,7 @@ public class AuthController {
     //TODO!! VA TOLTO ALTRIMENTI SI REGISTRA CHIUNQUE
 
     // POST /users
-    @PostMapping("/registration")
+    @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody @Validated UserRegistrationDTO dto) {
         return userService.save(dto);

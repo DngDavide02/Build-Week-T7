@@ -2,9 +2,15 @@ package Team7.Build_Week_T7.controller;
 
 import Team7.Build_Week_T7.entities.Clienti;
 import Team7.Build_Week_T7.entities.TipoCliente;
+import Team7.Build_Week_T7.exception.ValidationException;
+import Team7.Build_Week_T7.payload.ClienteRespDTO;
+import Team7.Build_Week_T7.payload.ClientiDTO;
 import Team7.Build_Week_T7.payload.ClientiUpdateDTO;
+import Team7.Build_Week_T7.payload.IndirizziDTO;
 import Team7.Build_Week_T7.service.ClienteService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,9 +43,17 @@ public class ClienteController {
     }
 
     @PostMapping
-    public Clienti creaClienti (@RequestBody Clienti cliente) {
-        return clienteService.creaCliente(cliente);
+    public ClienteRespDTO creaClienti(@RequestBody @Validated ClientiDTO dto, BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            List<String> errors = validationResult.getFieldErrors().stream()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .toList();
+            throw new ValidationException(errors);
+        }
+        Clienti clienti = clienteService.creaCliente(dto);
+        return new ClienteRespDTO(clienti.getId());
     }
+
 
     @PutMapping("/{id}")
     public Clienti updateCliente(@PathVariable Long id, @RequestBody ClientiUpdateDTO dettagliCliente) {
