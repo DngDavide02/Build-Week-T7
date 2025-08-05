@@ -79,6 +79,10 @@ public class ComuneCSVService {
                 .trim();
     }
 
+    public Comune findById(Long comuneId) {
+        return this.comuneRepository.findById(comuneId).orElseThrow(() -> new NotFoundException(comuneId));
+    }
+
     @PostConstruct
     public void init() {
         if (comuneRepository.count() == 0) {
