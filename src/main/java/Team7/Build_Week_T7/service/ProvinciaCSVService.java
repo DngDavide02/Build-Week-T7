@@ -2,7 +2,6 @@ package Team7.Build_Week_T7.service;
 
 import Team7.Build_Week_T7.entities.Provincia;
 import Team7.Build_Week_T7.exception.NotFoundException;
-import Team7.Build_Week_T7.payload.ComuneDTO;
 import Team7.Build_Week_T7.payload.ProvinciaDTO;
 import Team7.Build_Week_T7.repository.ProvinciaRepository;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class ProvinciaCSVService {
@@ -39,10 +37,12 @@ public class ProvinciaCSVService {
                     .parse();
 
             for (ProvinciaDTO provinciaDTO : provinciaDTOList) {
-                if (!provinciaRepository.existsByProvinciaIgnoreCase(provinciaDTO.getProvincia().trim())) {
+                String nomeProvinciaNormalizzato = normalizzaNome(provinciaDTO.getProvincia());
+
+                if (!provinciaRepository.existsByProvinciaIgnoreCase(nomeProvinciaNormalizzato)) {
                     Provincia provincia = new Provincia();
                     provincia.setSigla(provinciaDTO.getSigla().trim());
-                    provincia.setProvincia(provinciaDTO.getProvincia().trim());
+                    provincia.setProvincia(nomeProvinciaNormalizzato);
                     provincia.setRegione(provinciaDTO.getRegione().trim());
                     provinciaRepository.save(provincia);
                 }
@@ -52,12 +52,20 @@ public class ProvinciaCSVService {
         }
     }
 
+    private String normalizzaNome(String nome) {
+        return nome
+                .replace("-", " ")
+                .replace("/", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
+    }
+
     @PostConstruct
     public void init() {
         if (provinciaRepository.count() == 0) {
             importaCSVProvincia();
         } else {
-            System.out.println("provincie già presenti.");
+            System.out.println("Province già presenti.");
         }
     }
 }

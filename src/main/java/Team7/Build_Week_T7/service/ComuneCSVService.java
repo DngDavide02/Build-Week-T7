@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class ComuneCSVService {
@@ -45,21 +45,21 @@ public class ComuneCSVService {
 
         for (ComuneDTO comuneDTO : comuneDTOList) {
             if (!comuneRepository.existsByDenominazione(comuneDTO.getDenominazione())) {
-                String nomeProvinciaNormalizzato = comuneDTO.getProvincia()
-                        .replace("-", " ")
-                        .replace("  ", " ")
-                        .trim();
+                String nomeProvinciaNormalizzato = normalizzaNome(comuneDTO.getProvincia());
 
-                var provinciaOpt = provinciaRepository.findByProvinciaIgnoreCase(nomeProvinciaNormalizzato);
+                Optional<Provincia> provinciaOpt = provinciaRepository.findByProvinciaIgnoreCase(nomeProvinciaNormalizzato);
 
-
+                Provincia provincia;
                 if (provinciaOpt.isEmpty()) {
-                    System.err.println("Provincia non trovata per comune: " + comuneDTO.getDenominazione() +
-                            " | Provincia nel CSV: '" + comuneDTO.getProvincia() + "'");
-                    continue;
+                    provincia = new Provincia();
+                    provincia.setSigla("ND");
+                    provincia.setProvincia(nomeProvinciaNormalizzato);
+                    provincia.setRegione("ND");
+                    provinciaRepository.save(provincia);
+                    System.out.println("Provincia creata dinamicamente: " + nomeProvinciaNormalizzato);
+                } else {
+                    provincia = provinciaOpt.get();
                 }
-
-                Provincia provincia = provinciaOpt.get();
 
                 Comune comune = new Comune();
                 comune.setProgressivoComune(comuneDTO.getProgressivoComune().trim());
@@ -69,6 +69,14 @@ public class ComuneCSVService {
                 comuneRepository.save(comune);
             }
         }
+    }
+
+    private String normalizzaNome(String nome) {
+        return nome
+                .replace("-", " ")
+                .replace("/", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 
     @PostConstruct
