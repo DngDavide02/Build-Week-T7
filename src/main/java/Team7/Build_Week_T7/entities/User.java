@@ -6,15 +6,26 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonIgnoreProperties({"password", "authorities", "enabled", "accountNonExpired", "credentialsNonExpired", "accountNonLocked"})
+@JsonIgnoreProperties({
+        "password", "authorities",
+        "enabled", "accountNonExpired",
+        "credentialsNonExpired", "accountNonLocked"
+})
+public class User implements UserDetails {
 
-public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
@@ -33,6 +44,10 @@ public class User {
     private String cognome;
     private String avatar;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("user")  // evitiamo loop
+    private List<UserRole> roles;
+
     public User(String username, String email, String password, String nome, String cognome, String avatar) {
         this.username = username;
         this.email = email;
@@ -40,6 +55,20 @@ public class User {
         this.nome = nome;
         this.cognome = cognome;
         this.avatar = avatar;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(userRole ->
+                        new SimpleGrantedAuthority(userRole.getRole().getName()))
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public String getUsername() {
+        return this.email;
     }
 
 
