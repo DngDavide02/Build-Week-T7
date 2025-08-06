@@ -26,54 +26,59 @@ public class ComuneCSVService {
     @Autowired
     private ProvinciaRepository provinciaRepository;
 
-    public void importaCSVComuni() {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("comuni-italiani.csv");
+public void importaCSVComuni() {
+    InputStream inputStream = getClass().getClassLoader().getResourceAsStream("comuni-italiani.csv");
 
-        if (inputStream == null) {
-            throw new NotFoundException("File comuni-italiani.csv non trovato");
-        }
+    if (inputStream == null) {
+        throw new NotFoundException("File comuni-italiani.csv non trovato");
+    }
 
-        InputStreamReader reader = new InputStreamReader(inputStream);
+    InputStreamReader reader = new InputStreamReader(inputStream);
 
-        List<ComuneDTO> comuneDTOList = new CsvToBeanBuilder<ComuneDTO>(reader)
-                .withType(ComuneDTO.class)
-                .withSeparator(';')
-                .withIgnoreLeadingWhiteSpace(true)
-                .withSkipLines(1)
-                .build()
-                .parse();
+    List<ComuneDTO> comuneDTOList = new CsvToBeanBuilder<ComuneDTO>(reader)
+            .withType(ComuneDTO.class)
+            .withSeparator(';')
+            .withIgnoreLeadingWhiteSpace(true)
+            .withSkipLines(1)
+            .build()
+            .parse();
 
-        Set<String> provinceNonTrovate = new HashSet<>();
-        int importati = 0;
-        int saltati = 0;
+    Set<String> provinceNonTrovate = new HashSet<>();
+    int importati = 0;
+    int saltati = 0;
 
-        for (ComuneDTO comuneDTO : comuneDTOList) {
-            if (!comuneRepository.existsByDenominazione(comuneDTO.getDenominazione())) {
-                String nomeProvinciaNormalizzato = normalizzaNome(comuneDTO.getProvincia());
+    for (ComuneDTO comuneDTO : comuneDTOList) {
+        if (!comuneRepository.existsByDenominazione(comuneDTO.getDenominazione())) {
+            String nomeProvinciaRaw = comuneDTO.getProvincia().trim();
 
-                try {
-                    Provincia provincia = findByProvinciaIgnoreCase(nomeProvinciaNormalizzato);
+            switch (nomeProvinciaRaw.toLowerCase()) {
+                case "cagliari" -> nomeProvinciaRaw = "Sud Sardegna";
+            }
 
-                    Comune comune = new Comune();
-                    comune.setProgressivoComune(comuneDTO.getProgressivoComune().trim());
-                    comune.setDenominazione(comuneDTO.getDenominazione().trim());
-                    comune.setProvincia(provincia);
-                    comune.setCodiceProvincia(comuneDTO.getCodiceProvincia().trim());
-                    comuneRepository.save(comune);
-                    importati++;
+            String nomeProvinciaNormalizzato = normalizzaNome(nomeProvinciaRaw);
 
-                } catch (NotFoundException e) {
-                    provinceNonTrovate.add(nomeProvinciaNormalizzato);
-                    saltati++;
-                }
+            try {
+                Provincia provincia = findByProvinciaIgnoreCase(nomeProvinciaNormalizzato);
+
+                Comune comune = new Comune();
+                comune.setProgressivoComune(comuneDTO.getProgressivoComune().trim());
+                comune.setDenominazione(comuneDTO.getDenominazione().trim());
+                comune.setProvincia(provincia);
+                comune.setCodiceProvincia(comuneDTO.getCodiceProvincia().trim());
+                comuneRepository.save(comune);
+                importati++;
+
+            } catch (NotFoundException e) {
+                provinceNonTrovate.add(nomeProvinciaNormalizzato);
+                saltati++;
             }
         }
-
-        System.out.println("✅ Comuni importati: " + importati);
-        System.out.println("⛔ Comuni saltati per provincia non trovata: " + saltati);
+    }
+        System.out.println("Comuni importati: " + importati);
+        System.out.println("Comuni saltati per provincia non trovata: " + saltati);
 
         if (!provinceNonTrovate.isEmpty()) {
-            System.out.println("🚨 Province non trovate:");
+            System.out.println("Province non trovate:");
             provinceNonTrovate.forEach(System.out::println);
         }
     }

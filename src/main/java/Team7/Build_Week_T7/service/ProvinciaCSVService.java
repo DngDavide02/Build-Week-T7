@@ -42,22 +42,23 @@ public class ProvinciaCSVService {
                     Provincia provincia = new Provincia();
                     provincia.setSigla(provinciaDTO.getSigla().trim());
                     switch (nomeProvinciaNormalizzato.toLowerCase()) {
-                        case "Verbania" -> provincia.setProvincia("Verbano Cusio Ossola");
-                        case "Aosta" -> provincia.setProvincia("Valle d'Aosta Vallée d'Aoste");
-                        case "Monza-Brianza" -> provincia.setProvincia("Monza e della Brianza");
-                        case "Bolzano" -> provincia.setProvincia("Bolzano Bozen");
-                        case "La-Spezia" -> provincia.setProvincia("La Spezia");
-                        case "Reggio-Emilia" -> provincia.setProvincia("Reggio nell'Emilia");
-                        case "Forli-Cesena" -> provincia.setProvincia("Forlì Cesena");
-                        case "Massa-Carrara" -> provincia.setProvincia("Massa Carrara");
-                        case "Pesaro-Urbino" -> provincia.setProvincia("Pesaro e Urbino");
-                        case "Ascoli-Piceno" -> provincia.setProvincia("Ascoli Piceno");
-                        case "Barletta-Andria-Trani" -> provincia.setProvincia("Barletta Andria Trani");
-                        case "Reggio-Calabria" -> provincia.setProvincia("Reggio Calabria");
-                        case "Vibo-Valentia" -> provincia.setProvincia("Vibo Valentia");
-                        case "Cagliari" -> provincia.setProvincia("Sud Sardegna");
+                        case "verbania" -> provincia.setProvincia("Verbano Cusio Ossola");
+                        case "aosta" -> provincia.setProvincia("Valle d'Aosta Vallée d'Aoste");
+                        case "monza-brianza" -> provincia.setProvincia("Monza e della Brianza");
+                        case "bolzano" -> provincia.setProvincia("Bolzano Bozen");
+                        case "la-spezia" -> provincia.setProvincia("La Spezia");
+                        case "reggio-emilia" -> provincia.setProvincia("Reggio nell'Emilia");
+                        case "forli-cesena" -> provincia.setProvincia("Forlì Cesena");
+                        case "massa-carrara" -> provincia.setProvincia("Massa Carrara");
+                        case "pesaro-urbino" -> provincia.setProvincia("Pesaro e Urbino");
+                        case "ascoli-piceno" -> provincia.setProvincia("Ascoli Piceno");
+                        case "barletta-andria-trani" -> provincia.setProvincia("Barletta Andria Trani");
+                        case "reggio-calabria" -> provincia.setProvincia("Reggio Calabria");
+                        case "vibo-valentia" -> provincia.setProvincia("Vibo Valentia");
+                        case "cagliari" -> provincia.setProvincia("Sud Sardegna");
                         default -> provincia.setProvincia(nomeProvinciaNormalizzato);
                     }
+
                     provincia.setRegione(provinciaDTO.getRegione().trim());
                     provinciaRepository.save(provincia);
                 }
