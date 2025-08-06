@@ -4,12 +4,17 @@ package Team7.Build_Week_T7.controller;
 import Team7.Build_Week_T7.entities.Fatture;
 import Team7.Build_Week_T7.payload.FattureUpdateDTO;
 import Team7.Build_Week_T7.service.FattureService;
+import Team7.Build_Week_T7.exception.ValidationException;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -43,26 +48,23 @@ public class FattureController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Fatture> updateFattura(
-            @PathVariable Long id,
-            @RequestBody @Valid FattureUpdateDTO updateDTO) {
-        try {
-            Fatture updatedFattura = fattureService.updateFattura(id, updateDTO);
-            return ResponseEntity.ok(updatedFattura);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+    public Fatture updateFattura(@PathVariable Long id,
+                                 @RequestBody @Validated FattureUpdateDTO updateDTO,
+                                 BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            List<String> errors = validationResult.getFieldErrors().stream()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .toList();
+            throw new ValidationException(errors);
         }
+        return fattureService.findByIdAndUpdate(id, updateDTO);
     }
 
-
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Void> deleteFattura(@PathVariable Long id) {
-        if (fattureService.existsById(id)) {
-            fattureService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    public void deleteFattura(@PathVariable Long id) {
+        fattureService.findByIdAndDelete(id);
     }
 
 
