@@ -14,6 +14,7 @@ import Team7.Build_Week_T7.repository.IndirizziRepository;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -68,30 +69,33 @@ public class ClienteService {
         if (clientiRepository.existsByPartitaIVA(dto.partitaIVA())) {
             throw new BadRequestException("cliente con partita IVA già esistente");
         }
-
+        try {
         Indirizzi newIndirizzi = new Indirizzi(dto.via(), dto.civico(), dto.localita(), dto.cap(), comuneCSVService.findById(dto.comuneId()));
         Indirizzi savedIndirizzi = this.indirizziRepository.save(newIndirizzi);
 
-        Clienti cliente = new Clienti(
-                dto.ragioneSociale(),
-                dto.partitaIVA(),
-                dto.email(),
-                LocalDate.now(),
-                dto.dataUltimoContatto(),
-                dto.fatturatoAnnuale(),
-                dto.pec(),
-                dto.telefono(),
-                dto.emailContatto(),
-                dto.nomeContatto(),
-                dto.cognomeContatto(),
-                dto.telefonoContatto(),
-                dto.logoAziendale(),
-                dto.tipoCliente(),
-                newIndirizzi,
-                newIndirizzi
-        );
 
-        return clientiRepository.save(cliente);
+            Clienti cliente = new Clienti(
+                    dto.ragioneSociale(),
+                    dto.partitaIVA(),
+                    dto.email(),
+                    LocalDate.now(),
+                    dto.dataUltimoContatto(),
+                    dto.fatturatoAnnuale(),
+                    dto.pec(),
+                    dto.telefono(),
+                    dto.emailContatto(),
+                    dto.nomeContatto(),
+                    dto.cognomeContatto(),
+                    dto.telefonoContatto(),
+                    dto.logoAziendale(),
+                    dto.tipoCliente(),
+                    newIndirizzi,
+                    newIndirizzi
+            );
+            return clientiRepository.save(cliente);
+        }catch (Exception e){
+            throw new BadRequestException("formato inserito non corretto");
+        }
     }
 
 
