@@ -2,6 +2,7 @@ package Team7.Build_Week_T7.service;
 
 
 import Team7.Build_Week_T7.entities.Fatture;
+import Team7.Build_Week_T7.payload.FattureUpdateDTO;
 import Team7.Build_Week_T7.repository.FattureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -42,13 +43,25 @@ public class FattureService {
     }
 
 
-    public Fatture updateFattura(Long id, Fatture fattura) {
-        if (fattureRepository.existsById(id)) {
-            fattura.setId(id);
-            return fattureRepository.save(fattura);
+    public Fatture updateFattura(Long id, FattureUpdateDTO updateDTO) {
+        Fatture esistente = fattureRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Fattura con ID " + id + " non trovata"));
+
+        if (updateDTO.data() != null) {
+            esistente.setData(updateDTO.data());
         }
-        throw new IllegalArgumentException("Fattura con ID " + id + " non trovata");
+
+        if (updateDTO.importo() != null) {
+            esistente.setImporto(updateDTO.importo());
+        }
+
+        if (updateDTO.numero() != null) {
+            esistente.setNumero(updateDTO.numero());
+        }
+
+        return fattureRepository.save(esistente);
     }
+
 
 
     public boolean existsById(Long id) {

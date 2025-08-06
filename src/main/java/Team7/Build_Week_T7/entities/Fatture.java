@@ -4,7 +4,8 @@ package Team7.Build_Week_T7.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+
 
 @Getter
 @Entity
@@ -15,7 +16,7 @@ public class Fatture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
     private Long id;
-    private LocalDateTime data;
+    private LocalDate data;
     private int importo;
     private int numero;
 
@@ -26,7 +27,11 @@ public class Fatture {
     @ManyToOne
     private Clienti clienti;
 
-    public void setId(Long id) {
-        this.id = id;
+    public Fatture(LocalDate data, int importo, int numero, StatoFatture statoFatture, Clienti clienti) {
+        this.data = data;
+        this.importo = importo;
+        this.numero = numero;
+        this.statoFatture = statoFatture;
+        this.clienti = clienti;
     }
 }

@@ -2,11 +2,10 @@ package Team7.Build_Week_T7.controller;
 
 
 import Team7.Build_Week_T7.entities.Fatture;
+import Team7.Build_Week_T7.payload.FattureUpdateDTO;
 import Team7.Build_Week_T7.service.FattureService;
 import jakarta.validation.Valid;
-import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +22,6 @@ public class FattureController {
 
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public List<Fatture> getAllFatture() {
         return fattureService.findAllFatture();
     }
@@ -47,14 +45,15 @@ public class FattureController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Fatture> updateFattura(
             @PathVariable Long id,
-            @RequestBody @Valid Fatture fattura) {
+            @RequestBody @Valid FattureUpdateDTO updateDTO) {
         try {
-            Fatture updatedFattura = fattureService.updateFattura(id, fattura);
+            Fatture updatedFattura = fattureService.updateFattura(id, updateDTO);
             return ResponseEntity.ok(updatedFattura);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
     }
+
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
