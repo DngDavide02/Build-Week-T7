@@ -156,4 +156,8 @@ public class ClienteService {
 
         return clientiRepository.save(cliente);
     }
+
+    public void deleteById(Long id) {
+        clientiRepository.deleteById(id);
+    }
 }
