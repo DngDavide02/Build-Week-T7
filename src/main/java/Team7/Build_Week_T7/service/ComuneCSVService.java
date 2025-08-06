@@ -7,24 +7,24 @@ import Team7.Build_Week_T7.payload.ComuneDTO;
 import Team7.Build_Week_T7.repository.ComuneRepository;
 import Team7.Build_Week_T7.repository.ProvinciaRepository;
 import com.opencsv.bean.CsvToBeanBuilder;
-import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ComuneCSVService {
 
-    private final ComuneRepository comuneRepository;
-    private final ProvinciaRepository provinciaRepository;
+    @Autowired
+    private ComuneRepository comuneRepository;
 
-    public ComuneCSVService(ComuneRepository comuneRepository, ProvinciaRepository provinciaRepository) {
-        this.comuneRepository = comuneRepository;
-        this.provinciaRepository = provinciaRepository;
-    }
+    @Autowired
+    private ProvinciaRepository provinciaRepository;
 
     public void importaCSVComuni() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("comuni-italiani.csv");
@@ -43,38 +43,44 @@ public class ComuneCSVService {
                 .build()
                 .parse();
 
+        Set<String> provinceNonTrovate = new HashSet<>();
+        int importati = 0;
+        int saltati = 0;
+
         for (ComuneDTO comuneDTO : comuneDTOList) {
             if (!comuneRepository.existsByDenominazione(comuneDTO.getDenominazione())) {
                 String nomeProvinciaNormalizzato = normalizzaNome(comuneDTO.getProvincia());
 
-                Optional<Provincia> provinciaOpt = provinciaRepository.findByProvinciaIgnoreCase(nomeProvinciaNormalizzato);
+                try {
+                    Provincia provincia = findByProvinciaIgnoreCase(nomeProvinciaNormalizzato);
 
-                Provincia provincia = null;
-                switch (provinciaOpt.toString()){
-                    case "Verbania" -> provincia.setProvincia("Verbano Cusio Ossola");
-                    case "Valle d'Aosta" -> provincia.setProvincia("Valle d'Aosta Vallée d'Aoste");
-                    case "Monza-Brianza" -> provincia.setProvincia("Monza e della Brianza");
-                    case "Bolzano" -> provincia.setProvincia("Bolzano Bozen");
-                    case "La-Spezia" -> provincia.setProvincia("La Spezia");
-                    case "Reggio-Emilia" -> provincia.setProvincia("Reggio nell'Emilia");
-                    case "Forli-Cesena" -> provincia.setProvincia("Forlì Cesena");
-                    case "Massa-Carrara" -> provincia.setProvincia("Massa Carrara");
-                    case "Pesaro-Urbino" -> provincia.setProvincia("Pesaro e Urbino");
-                    case "Ascoli-Piceno" -> provincia.setProvincia("Ascoli Piceno");
-                    case "Barletta-Andria-Trani" -> provincia.setProvincia("Barletta Andria Trani");
-                    case "Reggio-Calabria" -> provincia.setProvincia("Reggio Calabria");
-                    case "Vibo-Valentia" -> provincia.setProvincia("Vibo Valentia");
-                    case "Cagliari" -> provincia.setProvincia("Sud Sardegna");
+                    Comune comune = new Comune();
+                    comune.setProgressivoComune(comuneDTO.getProgressivoComune().trim());
+                    comune.setDenominazione(comuneDTO.getDenominazione().trim());
+                    comune.setProvincia(provincia);
+                    comune.setCodiceProvincia(comuneDTO.getCodiceProvincia().trim());
+                    comuneRepository.save(comune);
+                    importati++;
+
+                } catch (NotFoundException e) {
+                    provinceNonTrovate.add(nomeProvinciaNormalizzato);
+                    saltati++;
                 }
-                
-                Comune comune = new Comune();
-                comune.setProgressivoComune(comuneDTO.getProgressivoComune().trim());
-                comune.setDenominazione(comuneDTO.getDenominazione().trim());
-                comune.setProvincia(provincia);
-                comune.setCodiceProvincia(comuneDTO.getCodiceProvincia().trim());
-                comuneRepository.save(comune);
             }
         }
+
+        System.out.println("✅ Comuni importati: " + importati);
+        System.out.println("⛔ Comuni saltati per provincia non trovata: " + saltati);
+
+        if (!provinceNonTrovate.isEmpty()) {
+            System.out.println("🚨 Province non trovate:");
+            provinceNonTrovate.forEach(System.out::println);
+        }
+    }
+
+    public Provincia findByProvinciaIgnoreCase(String nomeProvincia) {
+        return provinciaRepository.findByProvinciaIgnoreCase(nomeProvincia)
+                .orElseThrow(() -> new NotFoundException("Provincia not found"));
     }
 
     private String normalizzaNome(String nome) {
@@ -86,15 +92,7 @@ public class ComuneCSVService {
     }
 
     public Comune findById(Long comuneId) {
-        return this.comuneRepository.findById(comuneId).orElseThrow(() -> new NotFoundException(comuneId));
-    }
-
-    @PostConstruct
-    public void init() {
-        if (comuneRepository.count() == 0) {
-            importaCSVComuni();
-        } else {
-            System.out.println("Comuni già presenti.");
-        }
+        return this.comuneRepository.findById(comuneId)
+                .orElseThrow(() -> new NotFoundException("Comune not found: " + comuneId));
     }
 }
