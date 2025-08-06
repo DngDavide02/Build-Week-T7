@@ -25,4 +25,8 @@ public class Fatture {
 
     @ManyToOne
     private Clienti clienti;
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
