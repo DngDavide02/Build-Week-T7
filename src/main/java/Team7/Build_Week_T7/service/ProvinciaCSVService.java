@@ -41,9 +41,9 @@ public class ProvinciaCSVService {
                 if (!provinciaRepository.existsByProvinciaIgnoreCase(nomeProvinciaNormalizzato)) {
                     Provincia provincia = new Provincia();
                     provincia.setSigla(provinciaDTO.getSigla().trim());
-                    switch (nomeProvinciaNormalizzato) {
+                    switch (nomeProvinciaNormalizzato.toLowerCase()) {
                         case "Verbania" -> provincia.setProvincia("Verbano Cusio Ossola");
-                        case "Valle d'Aosta" -> provincia.setProvincia("Valle d'Aosta Vallée d'Aoste");
+                        case "Aosta" -> provincia.setProvincia("Valle d'Aosta Vallée d'Aoste");
                         case "Monza-Brianza" -> provincia.setProvincia("Monza e della Brianza");
                         case "Bolzano" -> provincia.setProvincia("Bolzano Bozen");
                         case "La-Spezia" -> provincia.setProvincia("La Spezia");

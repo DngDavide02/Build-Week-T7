@@ -12,7 +12,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ComuneCSVService {
@@ -40,20 +43,38 @@ public class ComuneCSVService {
                 .build()
                 .parse();
 
+        Set<String> provinceNonTrovate = new HashSet<>();
+        int importati = 0;
+        int saltati = 0;
+
         for (ComuneDTO comuneDTO : comuneDTOList) {
             if (!comuneRepository.existsByDenominazione(comuneDTO.getDenominazione())) {
                 String nomeProvinciaNormalizzato = normalizzaNome(comuneDTO.getProvincia());
 
+                try {
+                    Provincia provincia = findByProvinciaIgnoreCase(nomeProvinciaNormalizzato);
 
-                Provincia provincia = this.findByProvinciaIgnoreCase(nomeProvinciaNormalizzato);
+                    Comune comune = new Comune();
+                    comune.setProgressivoComune(comuneDTO.getProgressivoComune().trim());
+                    comune.setDenominazione(comuneDTO.getDenominazione().trim());
+                    comune.setProvincia(provincia);
+                    comune.setCodiceProvincia(comuneDTO.getCodiceProvincia().trim());
+                    comuneRepository.save(comune);
+                    importati++;
 
-                Comune comune = new Comune();
-                comune.setProgressivoComune(comuneDTO.getProgressivoComune().trim());
-                comune.setDenominazione(comuneDTO.getDenominazione().trim());
-                comune.setProvincia(provincia);
-                comune.setCodiceProvincia(comuneDTO.getCodiceProvincia().trim());
-                comuneRepository.save(comune);
+                } catch (NotFoundException e) {
+                    provinceNonTrovate.add(nomeProvinciaNormalizzato);
+                    saltati++;
+                }
             }
+        }
+
+        System.out.println("✅ Comuni importati: " + importati);
+        System.out.println("⛔ Comuni saltati per provincia non trovata: " + saltati);
+
+        if (!provinceNonTrovate.isEmpty()) {
+            System.out.println("🚨 Province non trovate:");
+            provinceNonTrovate.forEach(System.out::println);
         }
     }
 
@@ -71,7 +92,7 @@ public class ComuneCSVService {
     }
 
     public Comune findById(Long comuneId) {
-        return this.comuneRepository.findById(comuneId).orElseThrow(() -> new NotFoundException(comuneId));
+        return this.comuneRepository.findById(comuneId)
+                .orElseThrow(() -> new NotFoundException("Comune not found: " + comuneId));
     }
-
 }

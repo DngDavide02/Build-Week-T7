@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ProvinciaRepository extends JpaRepository<Provincia, Long> {
     boolean existsByProvinciaIgnoreCase(String provincia);
-    Optional<Provincia> findByProvinciaIgnoreCase (String provincia);
+    Optional<Provincia> findByProvinciaIgnoreCase(String provincia);
 }
