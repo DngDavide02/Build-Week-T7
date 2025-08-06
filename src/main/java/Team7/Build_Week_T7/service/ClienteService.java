@@ -91,7 +91,7 @@ public class ClienteService {
                 newIndirizzi
         );
 
-        return clientiRepository.saveCustom(cliente);
+        return clientiRepository.save(cliente);
     }
 
 
