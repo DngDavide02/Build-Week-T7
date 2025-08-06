@@ -7,21 +7,18 @@ import Team7.Build_Week_T7.exception.BadRequestException;
 import Team7.Build_Week_T7.exception.NotFoundException;
 import Team7.Build_Week_T7.payload.ClientiDTO;
 import Team7.Build_Week_T7.payload.ClientiUpdateDTO;
-import Team7.Build_Week_T7.payload.IndirizziDTO;
 import Team7.Build_Week_T7.repository.ClientiRepository;
 import Team7.Build_Week_T7.repository.ComuneRepository;
 import Team7.Build_Week_T7.repository.IndirizziRepository;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 
 @Service
@@ -40,7 +37,7 @@ public class ClienteService {
     private IndirizziService indirizziService;
 
     @Autowired
-    private ComuneCSVService comuneCSVService;
+    private ComuneService comuneService;
 
     @Autowired
     private IndirizziRepository indirizziRepository;
@@ -60,7 +57,7 @@ public class ClienteService {
         return clientiRepository.findByTipoCliente(tipoCliente);
     }
 
-    public Clienti getClienteByID(Long id){
+    public Clienti getClienteByID(Long id) {
         return clientiRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(id));
     }
@@ -70,8 +67,8 @@ public class ClienteService {
             throw new BadRequestException("cliente con partita IVA già esistente");
         }
         try {
-        Indirizzi newIndirizzi = new Indirizzi(dto.via(), dto.civico(), dto.localita(), dto.cap(), comuneCSVService.findById(dto.comuneId()));
-        Indirizzi savedIndirizzi = this.indirizziRepository.save(newIndirizzi);
+            Indirizzi newIndirizzi = new Indirizzi(dto.via(), dto.civico(), dto.localita(), dto.cap(), comuneService.findById(dto.comuneId()));
+            Indirizzi savedIndirizzi = this.indirizziRepository.save(newIndirizzi);
 
 
             Clienti cliente = new Clienti(
@@ -93,7 +90,7 @@ public class ClienteService {
                     newIndirizzi
             );
             return clientiRepository.save(cliente);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new BadRequestException("formato inserito non corretto");
         }
     }
@@ -116,7 +113,7 @@ public class ClienteService {
     }
 
 
-    public Clienti updateCliente (Long id, ClientiUpdateDTO dettagliCliente) {
+    public Clienti updateCliente(Long id, ClientiUpdateDTO dettagliCliente) {
         Clienti cliente = clientiRepository.findById(id).orElseThrow(() -> new NotFoundException("cliente con id: " + id + " non trovato"));
 
         if (dettagliCliente.ragioneSociale() != null)

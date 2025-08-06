@@ -15,7 +15,7 @@ public class IndirizziService {
     private IndirizziRepository indirizziRepository;
 
     @Autowired
-    private ComuneCSVService comuneService;
+    private ComuneService comuneService;
 
     public Indirizzi findById(Long indirizzoId) {
         return this.indirizziRepository.findById(indirizzoId).orElseThrow(() -> new NotFoundException(indirizzoId));
