@@ -16,7 +16,7 @@ public class FattureService {
     @Autowired
     private FattureRepository fattureRepository;
 
-    // Recupera tutte le fatture
+
     public List<Fatture> findAllFatture() {
         return fattureRepository.findAll();
     }
@@ -26,22 +26,22 @@ public class FattureService {
         return fattureRepository.findAll(pageable);
     }
 
-    // Trova fattura per ID
+
     public Optional<Fatture> findById(Long id) {
         return fattureRepository.findById(id);
     }
 
-    // Salva una nuova fattura
+
     public Fatture save(Fatture fattura) {
         return fattureRepository.save(fattura);
     }
 
-    // Elimina una fattura per ID
+
     public void deleteById(Long id) {
         fattureRepository.deleteById(id);
     }
 
-    // Aggiorna una fattura esistente
+
     public Fatture updateFattura(Long id, Fatture fattura) {
         if (fattureRepository.existsById(id)) {
             fattura.setId(id);
@@ -50,17 +50,10 @@ public class FattureService {
         throw new IllegalArgumentException("Fattura con ID " + id + " non trovata");
     }
 
-    // Verifica se esiste una fattura con un determinato ID
+
     public boolean existsById(Long id) {
         return fattureRepository.existsById(id);
     }
-
-    // Conta il numero totale di fatture
-    public long countFatture() {
-        return fattureRepository.count();
-    }
-
-
 
 
 }
