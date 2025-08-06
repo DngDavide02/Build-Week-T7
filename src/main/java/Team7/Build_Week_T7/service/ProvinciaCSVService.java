@@ -5,7 +5,6 @@ import Team7.Build_Week_T7.exception.NotFoundException;
 import Team7.Build_Week_T7.payload.ProvinciaDTO;
 import Team7.Build_Week_T7.repository.ProvinciaRepository;
 import com.opencsv.bean.CsvToBeanBuilder;
-import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -37,12 +36,28 @@ public class ProvinciaCSVService {
                     .parse();
 
             for (ProvinciaDTO provinciaDTO : provinciaDTOList) {
-                String nomeProvinciaNormalizzato = normalizzaNome(provinciaDTO.getProvincia());
+                String nomeProvinciaNormalizzato = provinciaDTO.getProvincia();
 
                 if (!provinciaRepository.existsByProvinciaIgnoreCase(nomeProvinciaNormalizzato)) {
                     Provincia provincia = new Provincia();
                     provincia.setSigla(provinciaDTO.getSigla().trim());
-                    provincia.setProvincia(nomeProvinciaNormalizzato);
+                    switch (nomeProvinciaNormalizzato) {
+                        case "Verbania" -> provincia.setProvincia("Verbano Cusio Ossola");
+                        case "Valle d'Aosta" -> provincia.setProvincia("Valle d'Aosta Vallée d'Aoste");
+                        case "Monza-Brianza" -> provincia.setProvincia("Monza e della Brianza");
+                        case "Bolzano" -> provincia.setProvincia("Bolzano Bozen");
+                        case "La-Spezia" -> provincia.setProvincia("La Spezia");
+                        case "Reggio-Emilia" -> provincia.setProvincia("Reggio nell'Emilia");
+                        case "Forli-Cesena" -> provincia.setProvincia("Forlì Cesena");
+                        case "Massa-Carrara" -> provincia.setProvincia("Massa Carrara");
+                        case "Pesaro-Urbino" -> provincia.setProvincia("Pesaro e Urbino");
+                        case "Ascoli-Piceno" -> provincia.setProvincia("Ascoli Piceno");
+                        case "Barletta-Andria-Trani" -> provincia.setProvincia("Barletta Andria Trani");
+                        case "Reggio-Calabria" -> provincia.setProvincia("Reggio Calabria");
+                        case "Vibo-Valentia" -> provincia.setProvincia("Vibo Valentia");
+                        case "Cagliari" -> provincia.setProvincia("Sud Sardegna");
+                        default -> provincia.setProvincia(nomeProvinciaNormalizzato);
+                    }
                     provincia.setRegione(provinciaDTO.getRegione().trim());
                     provinciaRepository.save(provincia);
                 }
@@ -60,12 +75,4 @@ public class ProvinciaCSVService {
                 .trim();
     }
 
-    @PostConstruct
-    public void init() {
-        if (provinciaRepository.count() == 0) {
-            importaCSVProvincia();
-        } else {
-            System.out.println("Province già presenti.");
-        }
-    }
 }
