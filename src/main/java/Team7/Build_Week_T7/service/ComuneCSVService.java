@@ -49,18 +49,24 @@ public class ComuneCSVService {
 
                 Optional<Provincia> provinciaOpt = provinciaRepository.findByProvinciaIgnoreCase(nomeProvinciaNormalizzato);
 
-                Provincia provincia;
-                if (provinciaOpt.isEmpty()) {
-                    provincia = new Provincia();
-                    provincia.setSigla("ND");
-                    provincia.setProvincia(nomeProvinciaNormalizzato);
-                    provincia.setRegione("ND");
-                    provinciaRepository.save(provincia);
-                    System.out.println("Provincia creata dinamicamente: " + nomeProvinciaNormalizzato);
-                } else {
-                    provincia = provinciaOpt.get();
+                Provincia provincia = null;
+                switch (provinciaOpt.toString()){
+                    case "Verbania" -> provincia.setProvincia("Verbano Cusio Ossola");
+                    case "Valle d'Aosta" -> provincia.setProvincia("Valle d'Aosta Vallée d'Aoste");
+                    case "Monza-Brianza" -> provincia.setProvincia("Monza e della Brianza");
+                    case "Bolzano" -> provincia.setProvincia("Bolzano Bozen");
+                    case "La-Spezia" -> provincia.setProvincia("La Spezia");
+                    case "Reggio-Emilia" -> provincia.setProvincia("Reggio nell'Emilia");
+                    case "Forli-Cesena" -> provincia.setProvincia("Forlì Cesena");
+                    case "Massa-Carrara" -> provincia.setProvincia("Massa Carrara");
+                    case "Pesaro-Urbino" -> provincia.setProvincia("Pesaro e Urbino");
+                    case "Ascoli-Piceno" -> provincia.setProvincia("Ascoli Piceno");
+                    case "Barletta-Andria-Trani" -> provincia.setProvincia("Barletta Andria Trani");
+                    case "Reggio-Calabria" -> provincia.setProvincia("Reggio Calabria");
+                    case "Vibo-Valentia" -> provincia.setProvincia("Vibo Valentia");
+                    case "Cagliari" -> provincia.setProvincia("Sud Sardegna");
                 }
-
+                
                 Comune comune = new Comune();
                 comune.setProgressivoComune(comuneDTO.getProgressivoComune().trim());
                 comune.setDenominazione(comuneDTO.getDenominazione().trim());
