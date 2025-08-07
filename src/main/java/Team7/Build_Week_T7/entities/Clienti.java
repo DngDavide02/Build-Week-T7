@@ -49,7 +49,7 @@ public class Clienti {
     public Clienti(String ragioneSociale, String partitaIVA, String email, LocalDate dataInserimento,
                    LocalDate dataUltimoContatto, int fatturatoAnnuale, String pec, String telefono,
                    String emailContatto, String nome, String cognome, String telefonoContatto,
-                   String logoAziendale, TipoCliente tipoCliente, Indirizzi sedeLegale, Indirizzi sedeOperativa) {
+                   TipoCliente tipoCliente, Indirizzi sedeLegale, Indirizzi sedeOperativa) {
         this.ragioneSociale = ragioneSociale;
         this.partitaIVA = partitaIVA;
         this.email = email;
@@ -62,7 +62,6 @@ public class Clienti {
         this.nome = nome;
         this.cognome = cognome;
         this.telefonoContatto = telefonoContatto;
-        this.logoAziendale = logoAziendale;
         this.tipoCliente = tipoCliente;
         this.sedeLegale = sedeLegale;
         this.sedeOperativa = sedeOperativa;

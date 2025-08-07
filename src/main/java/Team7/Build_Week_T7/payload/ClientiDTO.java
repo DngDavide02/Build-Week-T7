@@ -13,8 +13,6 @@ public record ClientiDTO(
         String partitaIVA,
         @NotEmpty(message = "email obbligatoria")
         String email,
-        @NotNull(message = "data inserimento obbligatoria")
-        LocalDate dataInserimento,
         @NotNull(message = "data ultimo contatto obbligatoria")
         LocalDate dataUltimoContatto,
         @NotNull(message = "fatturato obbligatorio")
@@ -31,8 +29,6 @@ public record ClientiDTO(
         String cognomeContatto,
         @NotEmpty(message = "telefono contatto obbligatorio")
         String telefonoContatto,
-        @NotEmpty(message = "logo obbligatorio")
-        String logoAziendale,
         @NotNull(message = "tipo obbligatorio")
         TipoCliente tipoCliente,
         @NotEmpty(message = "La via è obbligatorio!")

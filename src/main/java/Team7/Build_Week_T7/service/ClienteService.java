@@ -87,7 +87,6 @@ public class ClienteService {
                     dto.nomeContatto(),
                     dto.cognomeContatto(),
                     dto.telefonoContatto(),
-                    dto.logoAziendale(),
                     dto.tipoCliente(),
                     newIndirizzi,
                     newIndirizzi
@@ -213,7 +212,7 @@ public class ClienteService {
         if (sortBy != null) {
             switch (sortBy.toLowerCase()) {
                 case "cognome" -> sort = Sort.by("cognome").ascending();
-                case "nome" -> sort = Sort.by("nomeContatto").ascending();
+                case "nome" -> sort = Sort.by("nome").ascending();
                 case "fatturatoannuale" -> sort = Sort.by("fatturatoAnnuale").ascending();
                 case "datainserimento" -> sort = Sort.by("dataInserimento").ascending();
                 case "dataultimocontratto" -> sort = Sort.by("dataUltimoContratto").ascending();
