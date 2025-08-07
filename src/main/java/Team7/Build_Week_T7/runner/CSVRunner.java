@@ -10,6 +10,7 @@ import Team7.Build_Week_T7.service.ProvinciaCSVService;
 import Team7.Build_Week_T7.service.RoleService;
 import Team7.Build_Week_T7.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -17,30 +18,24 @@ import org.springframework.stereotype.Component;
 @Component
 public class CSVRunner implements CommandLineRunner {
 
+    @Value("${admin_password}")
+    String adPassword;
     @Autowired
     private ProvinciaCSVService provinciaCSVService;
-
     @Autowired
     private ComuneCSVService comuneCSVService;
-
     @Autowired
     private ProvinciaRepository provinciaRepository;
-
     @Autowired
     private ComuneRepository comuneRepository;
-
     @Autowired
     private RoleService roleService;
-
     @Autowired
     private RoleRepository roleRepository;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     @Autowired
     private UserRoleService userRoleService;
 
@@ -63,7 +58,8 @@ public class CSVRunner implements CommandLineRunner {
         } else System.out.println("Ruoli già presenti.");
 
         if (userRepository.count() == 0) {
-            String encodedPassword = passwordEncoder.encode("frontend");
+            System.out.println(adPassword);
+            String encodedPassword = passwordEncoder.encode(adPassword);
             User admin = new User(
                     "admin",
                     "admin@mail.com",
