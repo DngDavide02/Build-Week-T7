@@ -161,4 +161,36 @@ public class ClienteService {
     public void deleteById(Long id) {
         clientiRepository.deleteById(id);
     }
+
+    public List<Clienti> findAllByOrderByCognomeContattoAsc() {
+        return clientiRepository.findAllByOrderByCognomeContattoAsc();
+    }
+
+    public List<Clienti> findAllByOrderByFatturatoAnnualeAsc() {
+        return clientiRepository.findAllByOrderByFatturatoAnnualeAsc();
+    }
+
+    public List<Clienti> findAllByOrderByDataInserimentoAsc() {
+        return clientiRepository.findAllByOrderByDataInserimentoAsc();
+    }
+
+    public List<Clienti> findAllByOrderByDataUltimoContattoAsc() {
+        return clientiRepository.findAllByOrderByDataUltimoContattoAsc();
+    }
+
+    public List<Clienti> findByFatturatoAnnualeBetween(int min, int max) {
+        return clientiRepository.findByFatturatoAnnualeBetween(min, max);
+    }
+
+    public List<Clienti> findByDataInserimentoGreaterThan(LocalDate min) {
+        return clientiRepository.findByDataInserimentoGreaterThan(min);
+    }
+
+    public List<Clienti> findByDataUltimoContattoGreaterThan(LocalDate min) {
+        return clientiRepository.findByDataUltimoContattoGreaterThan(min);
+    }
+
+    public List<Clienti> findByCognomeContattoIgnoreCaseLike(String cognome) {
+        return clientiRepository.findByCognomeContattoIgnoreCaseLike(cognome);
+    }
 }
