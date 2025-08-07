@@ -26,5 +26,9 @@ public class RoleService {
         return roleRepository.findByName(name.toUpperCase())
                 .orElseThrow(() -> new NotFoundException("Role not found"));
     }
+
+    public boolean roleExist(String name) {
+        return roleRepository.findByName(name.toUpperCase()).isPresent();
+    }
 }
 

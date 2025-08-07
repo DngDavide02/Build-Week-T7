@@ -21,12 +21,10 @@ public record UserRegistrationDTO(
         @Email(message = "Email must be valid")
         String email,
 
-        @NotEmpty
         String role,
 
         @NotEmpty(message = "Password is required")
         String password
 
-        
 ) {
 }

@@ -1,9 +1,12 @@
 package Team7.Build_Week_T7.controller;
 
+import Team7.Build_Week_T7.entities.Role;
 import Team7.Build_Week_T7.entities.User;
 import Team7.Build_Week_T7.exception.ValidationException;
 import Team7.Build_Week_T7.payload.UserRegistrationDTO;
 import Team7.Build_Week_T7.payload.UserRespDTO;
+import Team7.Build_Week_T7.service.RoleService;
+import Team7.Build_Week_T7.service.UserRoleService;
 import Team7.Build_Week_T7.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +24,12 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private UserRoleService userRoleService;
 
     // GET all users - only for ADMIN
     @GetMapping
@@ -40,8 +49,20 @@ public class UserController {
                     .toList();
             throw new ValidationException(errors);
         }
-
+        Role userRole;
+        Role newRole = roleService.getRoleByName("user");
+        if (payload.role().equalsIgnoreCase("admin")) {
+            userRole = roleService.getRoleByName("admin");
+        } else {
+            userRole = roleService.getRoleByName("user");
+            if (!payload.role().isEmpty() && !payload.role().equalsIgnoreCase("user")) {
+                if (roleService.roleExist(payload.role())) newRole = roleService.getRoleByName(payload.role());
+                else newRole = roleService.createRole(payload.role());
+            }
+        }
         User newUser = userService.save(payload);
+        userRoleService.save(newUser, userRole);
+        if (!newRole.getName().equalsIgnoreCase("user")) userRoleService.save(newUser, newRole);
         return new UserRespDTO(newUser.getId());
     }
 
