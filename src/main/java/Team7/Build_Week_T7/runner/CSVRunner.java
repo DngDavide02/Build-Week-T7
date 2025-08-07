@@ -58,7 +58,6 @@ public class CSVRunner implements CommandLineRunner {
         } else System.out.println("Ruoli già presenti.");
 
         if (userRepository.count() == 0) {
-            System.out.println(adPassword);
             String encodedPassword = passwordEncoder.encode(adPassword);
             User admin = new User(
                     "admin",
