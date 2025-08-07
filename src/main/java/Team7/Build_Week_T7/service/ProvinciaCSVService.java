@@ -55,7 +55,6 @@ public class ProvinciaCSVService {
                         case "barletta-andria-trani" -> provincia.setProvincia("Barletta Andria Trani");
                         case "reggio-calabria" -> provincia.setProvincia("Reggio Calabria");
                         case "vibo-valentia" -> provincia.setProvincia("Vibo Valentia");
-                        case "cagliari" -> provincia.setProvincia("Sud Sardegna");
                         default -> provincia.setProvincia(nomeProvinciaNormalizzato);
                     }
 
@@ -63,6 +62,7 @@ public class ProvinciaCSVService {
                     provinciaRepository.save(provincia);
                 }
             }
+            provinciaRepository.save(new Provincia("SU", "Sud Sardegna", "Sardegna"));
         } catch (NotFoundException e) {
             throw new NotFoundException("CSV non trovato");
         }
