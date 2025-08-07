@@ -30,8 +30,8 @@ public class Clienti {
     private String pec;
     private String telefono;
     private String emailContatto;
-    private String nomeContatto;
-    private String cognomeContatto;
+    private String nome;
+    private String cognome;
     private String telefonoContatto;
     private String logoAziendale;
 
@@ -48,7 +48,7 @@ public class Clienti {
 
     public Clienti(String ragioneSociale, String partitaIVA, String email, LocalDate dataInserimento,
                    LocalDate dataUltimoContatto, int fatturatoAnnuale, String pec, String telefono,
-                   String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto,
+                   String emailContatto, String nome, String cognome, String telefonoContatto,
                    String logoAziendale, TipoCliente tipoCliente, Indirizzi sedeLegale, Indirizzi sedeOperativa) {
         this.ragioneSociale = ragioneSociale;
         this.partitaIVA = partitaIVA;
@@ -59,8 +59,8 @@ public class Clienti {
         this.pec = pec;
         this.telefono = telefono;
         this.emailContatto = emailContatto;
-        this.nomeContatto = nomeContatto;
-        this.cognomeContatto = cognomeContatto;
+        this.nome = nome;
+        this.cognome = cognome;
         this.telefonoContatto = telefonoContatto;
         this.logoAziendale = logoAziendale;
         this.tipoCliente = tipoCliente;

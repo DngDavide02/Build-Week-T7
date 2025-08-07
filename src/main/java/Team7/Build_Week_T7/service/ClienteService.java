@@ -10,9 +10,12 @@ import Team7.Build_Week_T7.payload.ClientiUpdateDTO;
 import Team7.Build_Week_T7.repository.ClientiRepository;
 import Team7.Build_Week_T7.repository.ComuneRepository;
 import Team7.Build_Week_T7.repository.IndirizziRepository;
+import Team7.Build_Week_T7.specification.ClientiSpec;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -141,10 +144,10 @@ public class ClienteService {
             cliente.setEmailContatto(dettagliCliente.emailContatto());
 
         if (dettagliCliente.nomeContatto() != null)
-            cliente.setNomeContatto(dettagliCliente.nomeContatto());
+            cliente.setNome(dettagliCliente.nomeContatto());
 
         if (dettagliCliente.cognomeContatto() != null)
-            cliente.setCognomeContatto(dettagliCliente.cognomeContatto());
+            cliente.setCognome(dettagliCliente.cognomeContatto());
 
         if (dettagliCliente.telefonoContatto() != null)
             cliente.setTelefonoContatto(dettagliCliente.telefonoContatto());
@@ -162,35 +165,62 @@ public class ClienteService {
         clientiRepository.deleteById(id);
     }
 
-    public List<Clienti> findAllByOrderByCognomeContattoAsc() {
-        return clientiRepository.findAllByOrderByCognomeContattoAsc();
-    }
+    public List<Clienti> getClienti(
+            Integer max,
+            Integer min,
+            LocalDate dataInserimento,
+            LocalDate dataUltimoContratto,
+            String cognome,
+            String nome,
+            String sortBy
+    ) {
+        List<String> campi = List.of(
+                "cognome",
+                "nome",
+                "fatturatoAnnuale",
+                "dataInserimento",
+                "dataUltimoContratto"
+        );
+        Specification<Clienti> specification = (root, query, cb) -> cb.conjunction();
 
-    public List<Clienti> findAllByOrderByFatturatoAnnualeAsc() {
-        return clientiRepository.findAllByOrderByFatturatoAnnualeAsc();
-    }
+        if (max != null) {
+            specification = specification.and(ClientiSpec.fatturatoMaggioreDi(max));
+        }
 
-    public List<Clienti> findAllByOrderByDataInserimentoAsc() {
-        return clientiRepository.findAllByOrderByDataInserimentoAsc();
-    }
+        if (min != null) {
+            specification = specification.and(ClientiSpec.fatturatoMinoreeDi(min));
+        }
 
-    public List<Clienti> findAllByOrderByDataUltimoContattoAsc() {
-        return clientiRepository.findAllByOrderByDataUltimoContattoAsc();
-    }
+        if (dataInserimento != null) {
+            specification = specification.and(ClientiSpec.dataDiInserimentoMaggioreDi(dataInserimento));
+        }
 
-    public List<Clienti> findByFatturatoAnnualeBetween(int min, int max) {
-        return clientiRepository.findByFatturatoAnnualeBetween(min, max);
-    }
+        if (dataUltimoContratto != null) {
+            specification = specification.and(ClientiSpec.dataUltimoContrattoMaggioreDi(dataUltimoContratto));
+        }
 
-    public List<Clienti> findByDataInserimentoGreaterThan(LocalDate min) {
-        return clientiRepository.findByDataInserimentoGreaterThan(min);
-    }
+        if (cognome != null && !cognome.isEmpty()) {
+            specification = specification.and(ClientiSpec.findByCognomeContratto(cognome));
+        }
 
-    public List<Clienti> findByDataUltimoContattoGreaterThan(LocalDate min) {
-        return clientiRepository.findByDataUltimoContattoGreaterThan(min);
-    }
+        if (nome != null && !nome.isEmpty()) {
+            specification = specification.and(ClientiSpec.findByNomeContatto(nome));
+        }
 
-    public List<Clienti> findByCognomeContattoIgnoreCaseLike(String cognome) {
-        return clientiRepository.findByCognomeContattoIgnoreCaseLike(cognome);
+
+        Sort sort = Sort.unsorted();
+
+        if (sortBy != null) {
+            switch (sortBy.toLowerCase()) {
+                case "cognome" -> sort = Sort.by("cognome").ascending();
+                case "nome" -> sort = Sort.by("nomeContatto").ascending();
+                case "fatturatoannuale" -> sort = Sort.by("fatturatoAnnuale").ascending();
+                case "datainserimento" -> sort = Sort.by("dataInserimento").ascending();
+                case "dataultimocontratto" -> sort = Sort.by("dataUltimoContratto").ascending();
+            }
+        }
+
+
+        return clientiRepository.findAll(specification, sort);
     }
 }
