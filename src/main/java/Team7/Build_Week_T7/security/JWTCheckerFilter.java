@@ -33,6 +33,11 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization"); // "Bearer k1lm2m34lkmxc0898u213lk21nm390.213489us09c.123u91283"
         if (authHeader == null || !authHeader.startsWith("Bearer "))
             throw new UnauthorizedException("Please enter the token in the Authorization Header in the correct format!");
@@ -56,7 +61,8 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
     // disabilito questo filtro per determinati endpoints
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return new AntPathMatcher().match("/auth/**", request.getServletPath());
-
+        return "OPTIONS".equalsIgnoreCase(request.getMethod()) ||
+                new AntPathMatcher().match("/auth/**", request.getServletPath());
     }
+
 }
