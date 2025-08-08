@@ -2,6 +2,7 @@ package Team7.Build_Week_T7.controller;
 
 
 import Team7.Build_Week_T7.entities.Fatture;
+import Team7.Build_Week_T7.payload.FattureDTO;
 import Team7.Build_Week_T7.payload.FattureUpdateDTO;
 import Team7.Build_Week_T7.service.FattureService;
 import Team7.Build_Week_T7.exception.ValidationException;
@@ -41,11 +42,19 @@ public class FattureController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
-    public Fatture createFattura(@RequestBody @Valid Fatture fattura) {
-        return fattureService.save(fattura);
+    public Fatture createFattura(@PathVariable Long id,
+                                 @RequestBody @Valid FattureDTO fattureDTO,
+                                 BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            List<String> errors = validationResult.getFieldErrors().stream()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .toList();
+            throw new ValidationException(errors);
+        }
+        return fattureService.save(fattureDTO,id);
     }
 
     @PutMapping("/{id}")

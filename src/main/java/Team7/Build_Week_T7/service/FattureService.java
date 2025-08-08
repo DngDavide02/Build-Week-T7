@@ -1,9 +1,11 @@
 package Team7.Build_Week_T7.service;
 
 
+import Team7.Build_Week_T7.entities.Clienti;
 import Team7.Build_Week_T7.entities.Fatture;
 import Team7.Build_Week_T7.entities.StatoFatture;
 import Team7.Build_Week_T7.exception.NotFoundException;
+import Team7.Build_Week_T7.payload.FattureDTO;
 import Team7.Build_Week_T7.payload.FattureUpdateDTO;
 import Team7.Build_Week_T7.repository.FattureRepository;
 import Team7.Build_Week_T7.repository.StatoFattureRepository;
@@ -23,6 +25,12 @@ public class FattureService {
     private FattureRepository fattureRepository;
 
     @Autowired
+    private StatoFatturaService statoFatturaService;
+
+    @Autowired
+    private ClienteService clienteService;
+
+    @Autowired
     private StatoFattureRepository statoFattureRepository;
 
 
@@ -35,12 +43,16 @@ public class FattureService {
     }
 
 
-    public Fatture save(Fatture fattura) {
-        if (fattura.getStatoFatture() == null) {
-            StatoFatture statoDaPagare = statoFattureRepository.findByStato("DA_PAGARE")
-                    .orElseThrow(() -> new NotFoundException("Stato 'DA_PAGARE' non trovato nel sistema"));
-            fattura.setStatoFatture(statoDaPagare);
-        }
+    public Fatture save(FattureDTO payload, long clienteId) {
+        StatoFatture daPagare = statoFatturaService.findByStato("DA_PAGARE");
+        Clienti cliente = clienteService.getClienteByID(clienteId);
+        Fatture fattura = new Fatture(
+          payload.data(),
+          payload.importo(),
+          payload.numero(),
+          daPagare,
+          cliente
+        );
         return fattureRepository.save(fattura);
     }
 
