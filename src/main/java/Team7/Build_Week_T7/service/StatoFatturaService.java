@@ -2,6 +2,7 @@ package Team7.Build_Week_T7.service;
 
 
 import Team7.Build_Week_T7.entities.StatoFatture;
+import Team7.Build_Week_T7.exception.NotFoundException;
 import Team7.Build_Week_T7.payload.StatoFattureDTO;
 import Team7.Build_Week_T7.repository.StatoFattureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,12 @@ public class StatoFatturaService {
                 .orElseThrow(() -> new IllegalArgumentException("Stato non trovato"));
         stato.setAttivo(false);
         statoFattureRepository.save(stato);
+    }
+
+    public StatoFatture findByStato(String stato) {
+      return  statoFattureRepository.findByStato(stato)
+                .orElseThrow(() -> new NotFoundException("Stato non trovato nel sistema"));
+
     }
 
     public List<StatoFatture> getAllStati() {
