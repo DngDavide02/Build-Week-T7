@@ -54,7 +54,7 @@ public class ClientiSpec {
 
     public static Specification<Clienti> dataDiInserimentoMaggioreDi(LocalDate date) {
         return ((root, query, builder) ->
-                builder.greaterThan(root.get("dataInserimento"), date));
+                builder.greaterThanOrEqualTo(root.get("dataInserimento"), date));
     }
 
     public static Specification<Clienti> dataUltimoContrattoMaggioreDi(LocalDate date) {

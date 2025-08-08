@@ -182,13 +182,14 @@ public class ClienteService {
         );
         Specification<Clienti> specification = (root, query, cb) -> cb.conjunction();
 
-        if (max != null) {
-            specification = specification.and(ClientiSpec.fatturatoMaggioreDi(max));
+        if (min != null && max != null) {
+            specification = specification.and(ClientiSpec.fatturatoCompresoTra(min, max));
+        } else if (min != null) {
+            specification = specification.and(ClientiSpec.fatturatoMaggioreDi(min));
+        } else if (max != null) {
+            specification = specification.and(ClientiSpec.fatturatoMinoreeDi(max));
         }
 
-        if (min != null) {
-            specification = specification.and(ClientiSpec.fatturatoMinoreeDi(min));
-        }
 
         if (dataInserimento != null) {
             specification = specification.and(ClientiSpec.dataDiInserimentoMaggioreDi(dataInserimento));
