@@ -1,14 +1,9 @@
 package Team7.Build_Week_T7.runner;
 
+import Team7.Build_Week_T7.entities.StatoFatture;
 import Team7.Build_Week_T7.entities.User;
-import Team7.Build_Week_T7.repository.ComuneRepository;
-import Team7.Build_Week_T7.repository.ProvinciaRepository;
-import Team7.Build_Week_T7.repository.RoleRepository;
-import Team7.Build_Week_T7.repository.UserRepository;
-import Team7.Build_Week_T7.service.ComuneCSVService;
-import Team7.Build_Week_T7.service.ProvinciaCSVService;
-import Team7.Build_Week_T7.service.RoleService;
-import Team7.Build_Week_T7.service.UserRoleService;
+import Team7.Build_Week_T7.repository.*;
+import Team7.Build_Week_T7.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -38,6 +33,10 @@ public class CSVRunner implements CommandLineRunner {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserRoleService userRoleService;
+    @Autowired
+    private StatoFattureRepository statoFattureRepository;
+    @Autowired
+    private StatoFatturaService statoFatturaService;
 
     @Override
     public void run(String... args) {
@@ -56,6 +55,11 @@ public class CSVRunner implements CommandLineRunner {
             roleService.createRole("admin");
             roleService.createRole("user");
         } else System.out.println("Ruoli già presenti.");
+
+        if(statoFattureRepository.count() == 0) {
+           statoFattureRepository.save(new StatoFatture("DA_PAGARE", "fatture da pagare"));
+            statoFattureRepository.save(new StatoFatture("PAGATE", "fatture pagate"));
+        }else System.out.println("stati gia presenti.");
 
         if (userRepository.count() == 0) {
             String encodedPassword = passwordEncoder.encode(adPassword);
