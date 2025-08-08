@@ -1,7 +1,6 @@
 package Team7.Build_Week_T7.service;
 
 
-import Team7.Build_Week_T7.entities.Clienti;
 import Team7.Build_Week_T7.entities.Fatture;
 import Team7.Build_Week_T7.entities.StatoFatture;
 import Team7.Build_Week_T7.exception.NotFoundException;
