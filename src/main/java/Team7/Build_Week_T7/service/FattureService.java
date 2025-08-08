@@ -7,7 +7,11 @@ import Team7.Build_Week_T7.entities.StatoFatture;
 import Team7.Build_Week_T7.exception.NotFoundException;
 import Team7.Build_Week_T7.payload.FattureUpdateDTO;
 import Team7.Build_Week_T7.repository.FattureRepository;
+import Team7.Build_Week_T7.repository.StatoFattureRepository;
+import Team7.Build_Week_T7.specification.FattureSpec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,6 +22,9 @@ import java.util.Optional;
 public class FattureService {
     @Autowired
     private FattureRepository fattureRepository;
+
+    @Autowired
+    private StatoFattureRepository statoFattureRepository;
 
 
     public List<Fatture> findAllFatture() {
@@ -30,8 +37,14 @@ public class FattureService {
 
 
     public Fatture save(Fatture fattura) {
+        if (fattura.getStatoFatture() == null) {
+            StatoFatture statoDaPagare = statoFattureRepository.findByStato("DA_PAGARE")
+                    .orElseThrow(() -> new NotFoundException("Stato 'DA_PAGARE' non trovato nel sistema"));
+            fattura.setStatoFatture(statoDaPagare);
+        }
         return fattureRepository.save(fattura);
     }
+
 
     public Fatture findByIdAndUpdate(Long id, FattureUpdateDTO updateDTO) {
         Fatture esistente = this.findById(id)
@@ -56,24 +69,48 @@ public class FattureService {
         fattureRepository.delete(found);
     }
 
-    public List<Fatture> findByClienti(Clienti cliente) {
-        return fattureRepository.findByClienti(cliente);
-    }
+    public List<Fatture> searchFatture(
+            String cliente,
+            String stato,
+            LocalDate data,
+            Integer anno,
+            Integer importoMin,
+            Integer importoMax,
+            String sortBy
+    ) {
+        Specification<Fatture> specification = (root, query, cb) -> cb.conjunction();
 
-    public List<Fatture> findByStatoFatture(StatoFatture statoFatture) {
-        return fattureRepository.findByStatoFatture(statoFatture);
-    }
+        if (cliente != null && !cliente.trim().isEmpty()) {
+            specification = specification.and(FattureSpec.clienteEqual(cliente));
+        }
 
-    public List<Fatture> findByDataGreaterThan(LocalDate min) {
-        return fattureRepository.findByDataGreaterThan(min);
-    }
+        if (stato != null && !stato.trim().isEmpty()) {
+            specification = specification.and(FattureSpec.statoEqual(stato));
+        }
 
-    public List<Fatture> findByDataBetween(int anno) {
-        return fattureRepository.findByDataBetween(LocalDate.of(anno, 1, 1), LocalDate.of(anno, 12, 31));
-    }
+        if (data != null) {
+            specification = specification.and(FattureSpec.dataEqual(data));
+        }
 
-    public List<Fatture> findByImportoBetween(int min, int max) {
-        return fattureRepository.findByImportoBetween(min, max);
+        if (anno != null) {
+            specification = specification.and(FattureSpec.annoEqual(LocalDate.of(anno, 1, 1)));
+        }
+
+        if (importoMin != null || importoMax != null) {
+            specification = specification.and(FattureSpec.importoRange(importoMin, importoMax));
+        }
+
+        Sort sort = Sort.unsorted();
+        if (sortBy != null) {
+            switch (sortBy.toLowerCase()) {
+                case "data" -> sort = Sort.by("data").ascending();
+                case "cliente" -> sort = Sort.by("clienti.ragioneSociale").ascending();
+                case "stato" -> sort = Sort.by("statoFatture.stato").ascending();
+                case "importo" -> sort = Sort.by("importo").ascending();
+            }
+        }
+
+        return fattureRepository.findAll(specification, sort);
     }
 
 }

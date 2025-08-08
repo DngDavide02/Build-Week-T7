@@ -4,13 +4,14 @@ import Team7.Build_Week_T7.entities.Clienti;
 import Team7.Build_Week_T7.entities.Fatture;
 import Team7.Build_Week_T7.entities.StatoFatture;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface FattureRepository extends JpaRepository<Fatture, Long> {
+public interface FattureRepository extends JpaRepository<Fatture, Long>, JpaSpecificationExecutor<Fatture> {
     // ricerca fatture per cliente
     List<Fatture> findByClienti(Clienti cliente);
 

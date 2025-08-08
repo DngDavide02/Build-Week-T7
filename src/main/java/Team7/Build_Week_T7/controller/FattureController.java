@@ -8,6 +8,7 @@ import Team7.Build_Week_T7.exception.ValidationException;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -67,5 +69,17 @@ public class FattureController {
         fattureService.findByIdAndDelete(id);
     }
 
+    @GetMapping("/searchFatture")
+    public List<Fatture> searchFatture(
+            @RequestParam(required = false) String cliente,
+            @RequestParam(required = false) String stato,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data,
+            @RequestParam(required = false) Integer anno,
+            @RequestParam(required = false) Integer importoMin,
+            @RequestParam(required = false) Integer importoMax,
+            @RequestParam(required = false) String sortBy
+    ) {
+        return fattureService.searchFatture(cliente, stato, data, anno, importoMin, importoMax, sortBy);
+    }
 
 }
