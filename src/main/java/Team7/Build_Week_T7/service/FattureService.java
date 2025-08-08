@@ -44,13 +44,14 @@ public class FattureService {
 
 
     public Fatture save(FattureDTO payload, long clienteId) {
-        StatoFatture daPagare = statoFatturaService.findByStato("DA_PAGARE");
+        StatoFatture statoFattura = statoFatturaService.findByStato("DA_PAGARE");
+        if (!payload.statoFatture().isEmpty()) statoFattura = statoFatturaService.findByStato(payload.statoFatture());
         Clienti cliente = clienteService.getClienteByID(clienteId);
         Fatture fattura = new Fatture(
           payload.data(),
           payload.importo(),
           payload.numero(),
-          daPagare,
+          statoFattura,
           cliente
         );
         return fattureRepository.save(fattura);
