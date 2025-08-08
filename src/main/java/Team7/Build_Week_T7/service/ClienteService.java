@@ -171,6 +171,7 @@ public class ClienteService {
             LocalDate dataUltimoContratto,
             String cognome,
             String nome,
+            String provincia,
             String sortBy
     ) {
         List<String> campi = List.of(
@@ -178,7 +179,8 @@ public class ClienteService {
                 "nome",
                 "fatturatoAnnuale",
                 "dataInserimento",
-                "dataUltimoContratto"
+                "dataUltimoContratto",
+                "provincia"
         );
         Specification<Clienti> specification = (root, query, cb) -> cb.conjunction();
 
@@ -207,6 +209,10 @@ public class ClienteService {
             specification = specification.and(ClientiSpec.findByNomeContatto(nome));
         }
 
+        if (provincia != null && !provincia.isEmpty()) {
+            specification = specification.and(ClientiSpec.findByProvincia(provincia));
+        }
+
 
         Sort sort = Sort.unsorted();
 
@@ -217,6 +223,7 @@ public class ClienteService {
                 case "fatturatoannuale" -> sort = Sort.by("fatturatoAnnuale").ascending();
                 case "datainserimento" -> sort = Sort.by("dataInserimento").ascending();
                 case "dataultimocontratto" -> sort = Sort.by("dataUltimoContratto").ascending();
+                case "provincia" -> sort = Sort.by("sedeLegale.comune.provincia.provincia").ascending();
             }
         }
 

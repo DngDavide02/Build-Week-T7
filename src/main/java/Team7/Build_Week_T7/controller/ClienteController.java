@@ -6,10 +6,8 @@ import Team7.Build_Week_T7.exception.ValidationException;
 import Team7.Build_Week_T7.payload.ClienteRespDTO;
 import Team7.Build_Week_T7.payload.ClientiDTO;
 import Team7.Build_Week_T7.payload.ClientiUpdateDTO;
-import Team7.Build_Week_T7.payload.IndirizziDTO;
 import Team7.Build_Week_T7.service.ClienteService;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -36,7 +34,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}")
-    public Clienti getClienteById(@PathVariable Long id){
+    public Clienti getClienteById(@PathVariable Long id) {
         return clienteService.getClienteByID(id);
     }
 
@@ -64,27 +62,28 @@ public class ClienteController {
     }
 
     @PostMapping("/{id}/upload-logo")
-    public String uploadLogoCliente(@PathVariable Long id, @RequestParam("file")MultipartFile file) {
+    public String uploadLogoCliente(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         return clienteService.uploadLogoCliente(id, file);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void deleteById(@PathVariable Long id){
+    public void deleteById(@PathVariable Long id) {
         clienteService.deleteById(id);
     }
 
     @GetMapping("/filtrati")
     public List<Clienti> getClienti(
-            @RequestParam (required = false) Integer max,
-           @RequestParam (required = false) Integer min,
-           @RequestParam (required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInserimento,
-           @RequestParam (required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataUltimoContratto,
-           @RequestParam (required = false) String cognome,
-           @RequestParam (required = false) String nome,
-           @RequestParam (required = false) String sortBy
-    ){
-        List<Clienti> clienti = clienteService.getClienti(max, min, dataInserimento, dataUltimoContratto, cognome, nome, sortBy);
+            @RequestParam(required = false) Integer max,
+            @RequestParam(required = false) Integer min,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInserimento,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataUltimoContratto,
+            @RequestParam(required = false) String cognome,
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String provincia,
+            @RequestParam(required = false) String sortBy
+    ) {
+        List<Clienti> clienti = clienteService.getClienti(max, min, dataInserimento, dataUltimoContratto, cognome, nome, provincia, sortBy);
         return clienti;
     }
 }
